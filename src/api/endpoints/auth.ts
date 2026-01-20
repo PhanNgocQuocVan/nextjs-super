@@ -1,20 +1,24 @@
-// src/api/endpoints/auth.ts
-import { useMutation } from "@tanstack/react-query";
-import { mainInstance } from "../mutator/custom-instance";
-import { LoginResponse } from "../mutator/models/auth";
+"use client";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useCustomClient } from "../mutator/custom-client";
+import { useAuthStore } from "@/stores/auth-store";
 
-// Hàm gọi API thuần
-export const postLogin = (data: any) => {
-  return mainInstance<LoginResponse>({
-    url: `/api/v1.0/auth/login`,
-    method: "POST",
-    data,
-  });
-};
+// Hook Đăng nhập
+export const useLogin = () => {
+  const setStore = useAuthStore((state) => state.setStore);
 
-// Hook mô phỏng Orval
-export const usePostLogin = () => {
   return useMutation({
-    mutationFn: postLogin,
+    mutationFn: (body: any) =>
+      useCustomClient<any>({ url: "/auth/login", method: "POST", data: body }),
+    onSuccess: (res) => {
+      if (res.data) {
+        console.log(res);
+
+        setStore({
+          accessToken: res.data.accessToken,
+          account: res.data.account,
+        });
+      }
+    },
   });
 };
