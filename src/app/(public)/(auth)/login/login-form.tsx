@@ -13,6 +13,8 @@ import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { useLogin } from "@/api/endpoints/auth";
 
 export default function LoginForm() {
   const form = useForm<LoginBodyType>({
@@ -22,6 +24,19 @@ export default function LoginForm() {
       password: "",
     },
   });
+
+  const loginMutation = useLogin();
+
+  const onSubmit = (data: LoginBodyType) => {
+    loginMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success("Đăng nhập thành công", { position: "top-center" });
+      },
+      onError: (error) => {
+        toast.error("Đăng nhập thất bại", { position: "top-center" });
+      },
+    });
+  };
 
   return (
     <Card className="mx-auto max-w-md w-full">
@@ -34,6 +49,7 @@ export default function LoginForm() {
       <CardContent>
         <Form {...form}>
           <form
+            onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-2 max-w-[600px] flex-shrink-0 w-full"
             noValidate
           >
@@ -50,6 +66,7 @@ export default function LoginForm() {
                         type="email"
                         placeholder="m@example.com"
                         required
+                        defaultValue="admin@order.com"
                         {...field}
                       />
                       <FormMessage />
@@ -70,6 +87,7 @@ export default function LoginForm() {
                         id="password"
                         type="password"
                         required
+                        defaultValue="123456"
                         {...field}
                       />
                       <FormMessage />
