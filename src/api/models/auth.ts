@@ -14,3 +14,12 @@ export interface LoginResponse {
   };
   message: string;
 }
+
+export interface ApiErrorResponse {
+  message: string;
+  statusCode: number;
+  errors?: {
+    field: string;
+    message: string;
+  }[];
+}
